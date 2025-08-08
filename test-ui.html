@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vehicle Test Cycle</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: all 0.4s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card.completed {
+      background: #dcdcdc;
+      transform: translateY(-8px);
+      opacity: 0.6;
+      z-index: 0;
+    }
+
+    .card.hidden {
+      display: none;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #0078D7;
+    }
+
+    .card p {
+      font-size: 16px;
+      color: #444;
+    }
+
+    .card button {
+      background: #0078D7;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .card button:hover {
+      background: #005fa3;
+    }
+
+    #progressBarContainer {
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 20px;
+      margin-top: 30px;
+    }
+
+    #progressBar {
+      height: 100%;
+      background: #0078D7;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    #resetBtn {
+      display: block;
+      margin: 30px auto 0;
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #resetBtn:hover {
+      background: #cc0000;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .card h2 {
+        font-size: 18px;
+      }
+
+      .card p {
+        font-size: 14px;
+      }
+
+      .card button {
+        font-size: 13px;
+        padding: 8px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🚗 Vehicle Test Instructions</h1>
+  <div id="instructions"></div>
+  <div id="progressBarContainer">
+    <div id="progressBar"></div>
+  </div>
+  <button id="resetBtn">🔄 Reset Cycle</button>
+
+  <script>
+    const steps = [
+      { number: 1, title: "Start Engine", description: "Turn on the ignition and let the engine idle for 2 minutes." },
+      { number: 2, title: "Warm-Up", description: "Drive at 30 km/h for 5 minutes to warm up the vehicle." },
+      { number: 3, title: "Acceleration Test", description: "Accelerate from 0 to 60 km/h within 10 seconds." },
+      { number: 4, title: "Brake Test", description: "Apply brakes firmly at 50 km/h and measure stopping distance." },
+      { number: 5, title: "Cool Down", description: "Let the vehicle idle for 3 minutes before shutting down." }
+    ];
+
+    let totalSteps = steps.length;
+    let completedSteps = 0;
+    let cardElements = [];
+
+    function renderSteps() {
+      const container = document.getElementById('instructions');
+      container.innerHTML = '';
+      cardElements = [];
+
+      steps.forEach((step, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        if (index > 0) card.classList.add('hidden'); // Only show first card initially
+
+        card.innerHTML = `
+          <h2>Step ${step.number}: ${step.title}</h2>
+          <p>${step.description}</p>
+          <button>✔ Mark as Complete</button>
+        `;
+
+        card.querySelector('button').addEventListener('click', () => {
+          if (!card.classList.contains('completed')) {
+            card.classList.add('completed');
+            completedSteps++;
+            updateProgress();
+
+            // Hide previous completed card
+            if (completedSteps > 1) {
+              cardElements[completedSteps - 2].classList.add('hidden');
+            }
+
+            // Show next card
+            if (completedSteps < totalSteps) {
+              cardElements[completedSteps].classList.remove('hidden');
+            }
+          }
+        });
+
+        container.appendChild(card);
+        cardElements.push(card);
+      });
+    }
+
+    function updateProgress() {
+      const percent = Math.round((completedSteps / totalSteps) * 100);
+      document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      completedSteps = 0;
+      renderSteps();
+      updateProgress();
+    });
+
+    renderSteps();
+    updateProgress();
+  </script>
+</body>
+</html>
